@@ -19,7 +19,7 @@ DAY_START_MINUTE = 30
 ZONE_PERCENT = 0.04   # 4% of the bar range
 
 # How many pips away from a zone the price must be to trigger an alert.
-ALERT_DISTANCE_PIPS = 5
+ALERT_DISTANCE_PIPS = 3
 
 # Delay between refresh cycles, in seconds.
 CHECK_INTERVAL_SECONDS = 60
