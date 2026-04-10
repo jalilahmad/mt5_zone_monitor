@@ -1,0 +1,7 @@
+MetaTrader5
+streamlit
+pandas
+numpy
+pytz
+plyer
+playsound
