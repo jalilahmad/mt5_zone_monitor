@@ -1,0 +1,136 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// © jalilahmad_fazeli
+
+//@version=6
+indicator("Yesterday + Last Week + Today + Current Week Zones PRO - SMART FINAL", overlay=true)
+
+// ===== SETTINGS =====
+zoneMode = input.string("Range", "Zone Mode", options=["Manual", "ATR", "Range"])
+zonePips = input.float(15, "Manual Zone Size (pips)")
+atrMult  = input.float(0.3, "ATR Zone Multiplier", step=0.1)
+zonePercent = input.float(0.2, "Range Percent (0.2 = 20%)", step=0.01)
+
+// Today logic settings
+pullbackPerc = input.float(0.3, "Pullback Percent (0.3 = 30%)", step=0.05)
+updateMinutes = input.int(15, "Update Interval (minutes)")
+
+dayFill   = input.color(color.new(color.orange, 25), "Yesterday Zone Fill")
+weekFill  = input.color(color.new(color.blue, 25), "Last Week Zone Fill")
+todayFill = input.color(color.new(color.yellow, 25), "Today Zone Fill")
+cwFill    = input.color(color.new(color.green, 25), "Current Week Zone Fill")
+borderCol = input.color(color.gray, "Border Color")
+
+// ===== BASE CALCULATIONS =====
+pip = syminfo.mintick
+manualZone = zonePips * pip
+atrZone = ta.atr(14) * atrMult
+
+updateMs = updateMinutes * 60 * 1000
+
+// ===== DAILY DATA =====
+[dHigh, dLow, dTime] = request.security(syminfo.tickerid, "D", [high, low, time],
+     barmerge.gaps_off, barmerge.lookahead_on)
+
+yHigh = dHigh[1]
+yLow  = dLow[1]
+yTime = dTime[1]
+
+// ===== WEEKLY DATA =====
+[wHigh, wLow, wTime] = request.security(syminfo.tickerid, "W", [high, low, time],
+     barmerge.gaps_off, barmerge.lookahead_off)
+
+lwHigh = wHigh[1]
+lwLow  = wLow[1]
+lwTime = wTime[1]
+
+// Current Week
+[cwHigh, cwLow, cwTime] = request.security(syminfo.tickerid, "W", [high, low, time],
+     barmerge.gaps_off, barmerge.lookahead_on)
+
+// ===== DYNAMIC ZONE SIZE =====
+dayRange = dHigh - dLow
+
+zoneSize =
+     zoneMode == "Manual" ? manualZone :
+     zoneMode == "ATR"    ? atrZone :
+     dayRange * zonePercent
+
+// ===== BOX VARS =====
+var box dHighBox = na
+var box dLowBox  = na
+var box wHighBox = na
+var box wLowBox  = na
+var box tHighBox = na
+var box tLowBox  = na
+var box cwHighBox = na
+var box cwLowBox  = na
+
+// ===== TODAY STATE =====
+var int lastUpdateTime = na
+
+// ===== YESTERDAY ZONES =====
+if timeframe.change("D")
+    box.delete(dHighBox)
+    box.delete(dLowBox)
+
+    dHighBox := box.new(yTime, yHigh, timenow, yHigh - zoneSize,
+        xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right)
+
+    dLowBox := box.new(yTime, yLow + zoneSize, timenow, yLow,
+        xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right)
+
+// ===== TODAY ZONES =====
+if timeframe.change("D")
+    lastUpdateTime := timenow
+
+    box.delete(tHighBox)
+    box.delete(tLowBox)
+
+    tHighBox := box.new(dTime, dHigh, timenow, dHigh - zoneSize,
+        xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
+
+    tLowBox := box.new(dTime, dLow + zoneSize, timenow, dLow,
+        xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
+
+else
+    currHigh = dHigh
+    currLow  = dLow
+
+    priceRange = currHigh - currLow
+    pullback = priceRange > 0 ? (currHigh - close) / priceRange : 0
+
+    timePassed = (timenow - lastUpdateTime) >= updateMs
+    canUpdate = timePassed and (pullback >= pullbackPerc)
+
+    if canUpdate
+        lastUpdateTime := timenow
+
+        box.delete(tHighBox)
+        box.delete(tLowBox)
+
+        tHighBox := box.new(dTime, currHigh, timenow, currHigh - zoneSize,
+            xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
+
+        tLowBox := box.new(dTime, currLow + zoneSize, timenow, currLow,
+            xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
+
+// ===== LAST WEEK ZONES =====
+if timeframe.change("W")
+    box.delete(wHighBox)
+    box.delete(wLowBox)
+
+    wHighBox := box.new(lwTime, lwHigh, timenow, lwHigh - zoneSize,
+        xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right)
+
+    wLowBox := box.new(lwTime, lwLow + zoneSize, timenow, lwLow,
+        xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right)
+
+// ===== CURRENT WEEK ZONES =====
+box.delete(cwHighBox)
+box.delete(cwLowBox)
+
+cwHighBox := box.new(cwTime, cwHigh, timenow, cwHigh - zoneSize,
+    xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
+
+cwLowBox := box.new(cwTime, cwLow + zoneSize, timenow, cwLow,
+    xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
