@@ -7,10 +7,12 @@ def get_watchlist_symbols():
     """Return the list of visible symbols from the MT5 terminal."""
 
     symbols = mt5.symbols_get()
-    symbol_names = []
+    if symbols is None:
+        return []
 
-    for s in symbols:
-        if s.visible:
-            symbol_names.append(s.name)
+    visible_names = [s.name for s in symbols if getattr(s, "visible", False)]
+    if visible_names:
+        return visible_names
 
-    return symbol_names
+    # Fallback: return all available symbols when no visible symbols are found
+    return [s.name for s in symbols if getattr(s, "name", None) is not None]

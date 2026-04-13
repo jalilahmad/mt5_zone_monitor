@@ -6,6 +6,7 @@ styled monitoring table. It also sends desktop notifications and audio alerts
 when the current market price is near a defined zone.
 """
 
+import MetaTrader5 as mt5
 import pandas as pd
 import streamlit as st
 import time
@@ -76,25 +77,43 @@ if "alerts_sent" not in st.session_state:
 
 placeholder = st.empty()
 
+def format_zone_value(symbol, low, high):
+    if low is None or high is None:
+        return None
+    return price_monitor.format_zone(symbol, low, high)
+
 while True:
     rows = []
 
     for symbol in symbols:
         price = price_monitor.get_symbol_price(symbol)
         if price is None:
+            rows.append({
+                "Symbol": symbol,
+                "Status": "No price",
+                "Today High Zone": None,
+                "Today Low Zone": None,
+                "Yesterday High Zone": None,
+                "Yesterday Low Zone": None,
+                "Current Week High Zone": None,
+                "Current Week Low Zone": None,
+                "Last Week High Zone": None,
+                "Last Week Low Zone": None
+            })
             continue
 
         daily = zone_calculator.calculate_daily_levels(symbol)
         weekly = zone_calculator.calculate_weekly_levels(symbol)
-        if daily is None:
-            continue
 
-        zones = {
-            "Today High Zone": daily["today_high_zone"],
-            "Today Low Zone": daily["today_low_zone"],
-            "Yesterday High Zone": daily["yesterday_high_zone"],
-            "Yesterday Low Zone": daily["yesterday_low_zone"]
-        }
+        zones = {}
+
+        if daily:
+            zones.update({
+                "Today High Zone": daily["today_high_zone"],
+                "Today Low Zone": daily["today_low_zone"],
+                "Yesterday High Zone": daily["yesterday_high_zone"],
+                "Yesterday Low Zone": daily["yesterday_low_zone"]
+            })
 
         if weekly:
             zones.update({
@@ -107,6 +126,8 @@ while True:
         status = "Safe"
 
         for name, level in zones.items():
+            if level is None:
+                continue
             if price_monitor.is_price_near_zone(symbol, price, level):
                 status = f"Near {name}"
                 alert_key = f"{symbol}:{name}"
@@ -118,18 +139,21 @@ while True:
         rows.append({
             "Symbol": symbol,
             "Status": status,
-            "Today High Zone": price_monitor.format_zone(symbol, daily["today_high_zone"], daily["today_high"]),
-            "Today Low Zone": price_monitor.format_zone(symbol, daily["today_low"], daily["today_low_zone"]),
-            "Yesterday High Zone": price_monitor.format_zone(symbol, daily["yesterday_high_zone"], daily["yesterday_high"]),
-            "Yesterday Low Zone": price_monitor.format_zone(symbol, daily["yesterday_low"], daily["yesterday_low_zone"]),
-            "Current Week High Zone": (price_monitor.format_zone(symbol, weekly["cw_high_zone"], weekly["cw_high"]) if weekly else None),
-            "Current Week Low Zone": (price_monitor.format_zone(symbol, weekly["cw_low"], weekly["cw_low_zone"]) if weekly else None),
-            "Last Week High Zone": (price_monitor.format_zone(symbol, weekly["lw_high_zone"], weekly["lw_high"]) if weekly else None),
-            "Last Week Low Zone": (price_monitor.format_zone(symbol, weekly["lw_low"], weekly["lw_low_zone"]) if weekly else None)
+            "Today High Zone": format_zone_value(symbol, daily["today_high_zone"], daily["today_high"]) if daily else None,
+            "Today Low Zone": format_zone_value(symbol, daily["today_low"], daily["today_low_zone"]) if daily else None,
+            "Yesterday High Zone": format_zone_value(symbol, daily["yesterday_high_zone"], daily["yesterday_high"]) if daily else None,
+            "Yesterday Low Zone": format_zone_value(symbol, daily["yesterday_low"], daily["yesterday_low_zone"]) if daily else None,
+            "Current Week High Zone": format_zone_value(symbol, weekly["cw_high_zone"], weekly["cw_high"]) if weekly else None,
+            "Current Week Low Zone": format_zone_value(symbol, weekly["cw_low"], weekly["cw_low_zone"]) if weekly else None,
+            "Last Week High Zone": format_zone_value(symbol, weekly["lw_high_zone"], weekly["lw_high"]) if weekly else None,
+            "Last Week Low Zone": format_zone_value(symbol, weekly["lw_low"], weekly["lw_low_zone"]) if weekly else None
         })
 
     df = pd.DataFrame(rows)
-    styled = highlight_zone_rows(df)
-    placeholder.dataframe(styled)
+    if df.empty:
+        placeholder.warning("No valid rows to display. Check MT5 prices and symbol visibility.")
+    else:
+        styled = highlight_zone_rows(df)
+        placeholder.dataframe(styled)
 
     time.sleep(config.CHECK_INTERVAL_SECONDS)
