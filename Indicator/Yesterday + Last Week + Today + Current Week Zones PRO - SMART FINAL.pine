@@ -19,6 +19,7 @@ weekFill  = input.color(color.new(color.blue, 25), "Last Week Zone Fill")
 todayFill = input.color(color.new(color.yellow, 25), "Today Zone Fill")
 cwFill    = input.color(color.new(color.green, 25), "Current Week Zone Fill")
 borderCol = input.color(color.gray, "Border Color")
+showZoneLabels = input.bool(true, "Show Zone Names")
 
 // ===== BASE CALCULATIONS =====
 pip = syminfo.mintick
@@ -74,7 +75,8 @@ if timeframe.change("D")
     box.delete(dLowBox)
 
     dHighBox := box.new(yTime, yHigh, timenow, yHigh - zoneSize,
-        xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right)
+        xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right,
+        text = showZoneLabels ? "YESTERDAY" : "", text_halign = text.align_center, text_valign = text.align_center, text_color = color.black, text_size = size.small)
 
     dLowBox := box.new(yTime, yLow + zoneSize, timenow, yLow,
         xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right)
@@ -87,7 +89,8 @@ if timeframe.change("D")
     box.delete(tLowBox)
 
     tHighBox := box.new(dTime, dHigh, timenow, dHigh - zoneSize,
-        xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
+        xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right,
+        text = showZoneLabels ? "TODAY" : "", text_halign = text.align_center, text_valign = text.align_center, text_color = color.black, text_size = size.small)
 
     tLowBox := box.new(dTime, dLow + zoneSize, timenow, dLow,
         xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
@@ -109,7 +112,8 @@ else
         box.delete(tLowBox)
 
         tHighBox := box.new(dTime, currHigh, timenow, currHigh - zoneSize,
-            xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
+            xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right,
+            text = showZoneLabels ? "TODAY" : "", text_halign = text.align_center, text_valign = text.align_center, text_color = color.black, text_size = size.small)
 
         tLowBox := box.new(dTime, currLow + zoneSize, timenow, currLow,
             xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
@@ -120,7 +124,8 @@ if timeframe.change("W")
     box.delete(wLowBox)
 
     wHighBox := box.new(lwTime, lwHigh, timenow, lwHigh - zoneSize,
-        xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right)
+        xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right,
+        text = showZoneLabels ? "LAST WEEK" : "", text_halign = text.align_center, text_valign = text.align_center, text_color = color.black, text_size = size.small)
 
     wLowBox := box.new(lwTime, lwLow + zoneSize, timenow, lwLow,
         xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right)
@@ -130,7 +135,8 @@ box.delete(cwHighBox)
 box.delete(cwLowBox)
 
 cwHighBox := box.new(cwTime, cwHigh, timenow, cwHigh - zoneSize,
-    xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
+    xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right,
+    text = showZoneLabels ? "CURRENT WEEK" : "", text_halign = text.align_center, text_valign = text.align_center, text_color = color.black, text_size = size.small)
 
 cwLowBox := box.new(cwTime, cwLow + zoneSize, timenow, cwLow,
     xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
