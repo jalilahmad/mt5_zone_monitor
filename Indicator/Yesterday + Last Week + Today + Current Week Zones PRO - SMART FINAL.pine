@@ -49,25 +49,11 @@ lwTime = wTime[1]
 
 // ===== DYNAMIC ZONE SIZE =====
 dayRange = dHigh - dLow
-yRange = yHigh - yLow
-lwRange = lwHigh - lwLow
-cwRange = cwHigh - cwLow
 
-yZoneSize = zoneMode == "Manual" ? manualZone :
-     zoneMode == "ATR"    ? atrZone :
-     yRange * zonePercent
-
-tZoneSize = zoneMode == "Manual" ? manualZone :
+zoneSize =
+     zoneMode == "Manual" ? manualZone :
      zoneMode == "ATR"    ? atrZone :
      dayRange * zonePercent
-
-lwZoneSize = zoneMode == "Manual" ? manualZone :
-     zoneMode == "ATR"    ? atrZone :
-     lwRange * zonePercent
-
-cwZoneSize = zoneMode == "Manual" ? manualZone :
-     zoneMode == "ATR"    ? atrZone :
-     cwRange * zonePercent
 
 // ===== BOX VARS =====
 var box dHighBox = na
@@ -79,32 +65,31 @@ var box tLowBox  = na
 var box cwHighBox = na
 var box cwLowBox  = na
 
-// ===== TODAY / WEEKLY STATE =====
-var int lastUpdateTimeDay = na
-var int lastUpdateTimeWeek = na
+// ===== TODAY STATE =====
+var int lastUpdateTime = na
 
 // ===== YESTERDAY ZONES =====
 if timeframe.change("D")
     box.delete(dHighBox)
     box.delete(dLowBox)
 
-    dHighBox := box.new(yTime, yHigh, timenow, yHigh - yZoneSize,
+    dHighBox := box.new(yTime, yHigh, timenow, yHigh - zoneSize,
         xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right)
 
-    dLowBox := box.new(yTime, yLow + yZoneSize, timenow, yLow,
+    dLowBox := box.new(yTime, yLow + zoneSize, timenow, yLow,
         xloc=xloc.bar_time, bgcolor=dayFill, border_color=borderCol, extend=extend.right)
 
 // ===== TODAY ZONES =====
 if timeframe.change("D")
-    lastUpdateTimeDay := timenow
+    lastUpdateTime := timenow
 
     box.delete(tHighBox)
     box.delete(tLowBox)
 
-    tHighBox := box.new(dTime, dHigh, timenow, dHigh - tZoneSize,
+    tHighBox := box.new(dTime, dHigh, timenow, dHigh - zoneSize,
         xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
 
-    tLowBox := box.new(dTime, dLow + tZoneSize, timenow, dLow,
+    tLowBox := box.new(dTime, dLow + zoneSize, timenow, dLow,
         xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
 
 else
@@ -114,19 +99,19 @@ else
     priceRange = currHigh - currLow
     pullback = priceRange > 0 ? (currHigh - close) / priceRange : 0
 
-    timePassed = (timenow - lastUpdateTimeDay) >= updateMs
+    timePassed = (timenow - lastUpdateTime) >= updateMs
     canUpdate = timePassed and (pullback >= pullbackPerc)
 
     if canUpdate
-        lastUpdateTimeDay := timenow
+        lastUpdateTime := timenow
 
         box.delete(tHighBox)
         box.delete(tLowBox)
 
-        tHighBox := box.new(dTime, currHigh, timenow, currHigh - tZoneSize,
+        tHighBox := box.new(dTime, currHigh, timenow, currHigh - zoneSize,
             xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
 
-        tLowBox := box.new(dTime, currLow + tZoneSize, timenow, currLow,
+        tLowBox := box.new(dTime, currLow + zoneSize, timenow, currLow,
             xloc=xloc.bar_time, bgcolor=todayFill, border_color=borderCol, extend=extend.right)
 
 // ===== LAST WEEK ZONES =====
@@ -134,42 +119,18 @@ if timeframe.change("W")
     box.delete(wHighBox)
     box.delete(wLowBox)
 
-    wHighBox := box.new(lwTime, lwHigh, timenow, lwHigh - lwZoneSize,
+    wHighBox := box.new(lwTime, lwHigh, timenow, lwHigh - zoneSize,
         xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right)
 
-    wLowBox := box.new(lwTime, lwLow + lwZoneSize, timenow, lwLow,
+    wLowBox := box.new(lwTime, lwLow + zoneSize, timenow, lwLow,
         xloc=xloc.bar_time, bgcolor=weekFill, border_color=borderCol, extend=extend.right)
 
 // ===== CURRENT WEEK ZONES =====
-if timeframe.change("W")
-    lastUpdateTimeWeek := timenow
+box.delete(cwHighBox)
+box.delete(cwLowBox)
 
-    box.delete(cwHighBox)
-    box.delete(cwLowBox)
+cwHighBox := box.new(cwTime, cwHigh, timenow, cwHigh - zoneSize,
+    xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
 
-    cwHighBox := box.new(cwTime, cwHigh, timenow, cwHigh - cwZoneSize,
-        xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
-
-    cwLowBox := box.new(cwTime, cwLow + cwZoneSize, timenow, cwLow,
-        xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
-else
-    currCwHigh = cwHigh
-    currCwLow  = cwLow
-
-    cwPriceRange = currCwHigh - currCwLow
-    cwPullback = cwPriceRange > 0 ? (currCwHigh - close) / cwPriceRange : 0
-
-    cwTimePassed = (timenow - lastUpdateTimeWeek) >= updateMs
-    cwCanUpdate = cwTimePassed and (cwPullback >= pullbackPerc)
-
-    if cwCanUpdate
-        lastUpdateTimeWeek := timenow
-
-        box.delete(cwHighBox)
-        box.delete(cwLowBox)
-
-        cwHighBox := box.new(cwTime, currCwHigh, timenow, currCwHigh - cwZoneSize,
-            xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
-
-        cwLowBox := box.new(cwTime, currCwLow + cwZoneSize, timenow, currCwLow,
-            xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
+cwLowBox := box.new(cwTime, cwLow + zoneSize, timenow, cwLow,
+    xloc=xloc.bar_time, bgcolor=cwFill, border_color=borderCol, extend=extend.right)
