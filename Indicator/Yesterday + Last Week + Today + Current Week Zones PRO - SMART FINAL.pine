@@ -8,7 +8,7 @@ indicator("Yesterday + Last Week + Today + Current Week Zones PRO - SMART FINAL"
 zoneMode = input.string("Range", "Zone Mode", options=["Manual", "ATR", "Range"])
 zonePips = input.float(15, "Manual Zone Size (pips)")
 atrMult  = input.float(0.3, "ATR Zone Multiplier", step=0.1)
-zonePercent = input.float(0.2, "Range Percent (0.2 = 20%)", step=0.01)
+zonePercent = input.float(0.04, "Range Percent (0.04 = 4%)", step=0.01)
 
 // Today logic settings
 pullbackPerc = input.float(0.3, "Pullback Percent (0.3 = 30%)", step=0.05)
