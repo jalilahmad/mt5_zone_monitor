@@ -1,5 +1,5 @@
 
-# 🇮🇷 MT5 Zone Monitor
+#  MT5 Zone Monitor
 ## ابزار مانیتورینگ زون‌های مهم بازار بر اساس استراتژی سطوح روزانه و هفتگی
 
 ---
@@ -193,7 +193,7 @@ README.md
 
 ---
 
-# 🇺🇸 MT5 Zone Monitor
+#  MT5 Zone Monitor
 ## Real-Time Zone Monitoring Tool
 
 ---
