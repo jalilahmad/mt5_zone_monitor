@@ -1,109 +1,301 @@
-# MT5 Zone Monitor
 
-MT5 Zone Monitor is a Streamlit dashboard that reads visible symbols from
-MetaTrader 5 and calculates daily/weekly price zones for monitoring and alerts.
-The app highlights active zones and sends desktop notifications when the current
-price is close to a support/resistance zone.
+# 🇮🇷 MT5 Zone Monitor
+## ابزار مانیتورینگ زون‌های مهم بازار بر اساس استراتژی سطوح روزانه و هفتگی
 
-## Features
+---
 
-- Connects to a running MetaTrader 5 terminal
-- Loads visible symbols automatically
-- Calculates daily and weekly zones based on high/low price bars
-- Displays zone ranges in a Streamlit dashboard
-- Highlights the active zone row and its column
-- Sends desktop alerts with sound when price is near a zone
-- Uses symbol decimal precision when formatting prices
+# 🎥 منبع استراتژی (ویدیو آموزشی)
 
-## Prerequisites
+این پروژه بر اساس استراتژی معرفی‌شده در ویدیوی زیر طراحی شده است:
 
-- Python 3.11 or newer
-- MetaTrader 5 installed and logged in
-- An active Internet connection for package installation
+📺 لینک ویدیو:
+https://www.youtube.com/watch?v=yRaVX650-Zs
 
-## Installation
+در این ویدیو، انواع سطوح مهم شامل:
 
-1. Create a Python virtual environment:
+- 🟨 Today High / Low  
+- 🟧 Yesterday High / Low  
+- 🟩 Last Week High / Low  
+- 🟦 Current Week High / Low  
+- 🟥 Higher Timeframe Levels  
 
-```bash
-python -m venv .venv
+به صورت کامل آموزش داده شده است.
+
+پیشنهاد می‌شود قبل از استفاده از ابزار، حتماً این ویدیو را مشاهده کنید.
+
+---
+
+# 🧠 معرفی پروژه
+
+**MT5 Zone Monitor** یک ابزار مانیتورینگ زنده است که:
+
+✔ به MetaTrader 5 متصل می‌شود  
+✔ نمادهای Market Watch را می‌خواند  
+✔ زون‌های مهم قیمت را محاسبه می‌کند  
+✔ قیمت را به صورت زنده بررسی می‌کند  
+✔ هنگام رسیدن قیمت به زون‌ها هشدار می‌دهد  
+
+هدف این ابزار این است که شما **نیازی به نگاه دائمی به چارت نداشته باشید**.
+
+---
+
+# 🎯 کاربرد پروژه
+
+این ابزار مناسب:
+
+✔ تریدرهای سبک Level-Based  
+✔ تریدرهای Intraday  
+✔ کاربران Multi-Symbol  
+✔ افرادی که نمی‌خواهند دائم چارت نگاه کنند  
+
+---
+
+# 🎨 معنی رنگ زون‌ها
+
+🟨 زرد — Today  
+سقف و کف امروز
+
+🟧 نارنجی — Yesterday  
+سقف و کف دیروز
+
+🟩 سبز — Last Week  
+سقف و کف هفته قبل (مهم‌ترین)
+
+🟦 آبی — Current Week  
+سقف و کف هفته جاری
+
+🟥 قرمز — Higher Timeframe  
+سطوح تایم بالا
+
+---
+
+# 📊 نحوه استفاده از اندیکاتور
+
+اندیکاتور داخل پوشه:
+
+```
+Indicator/
 ```
 
-2. Activate the environment:
+قرار دارد.
 
-- Windows PowerShell:
-  ```powershell
-  .\.venv\Scripts\Activate.ps1
-  ```
-- Windows Command Prompt:
-  ```cmd
-  .\.venv\Scripts\activate.bat
-  ```
+---
 
-3. Install dependencies:
+## مراحل استفاده از اندیکاتور
 
-```bash
+1️⃣ وارد TradingView شوید  
+
+2️⃣ کد اندیکاتور را باز کنید  
+
+3️⃣ یک Pine Script جدید بسازید  
+
+4️⃣ کد اندیکاتور را Paste کنید  
+
+5️⃣ روی Chart اجرا کنید  
+
+---
+
+## تنظیمات مهم اندیکاتور
+
+✔ نمایش High / Low روزانه  
+✔ نمایش High / Low هفتگی  
+✔ تنظیم ضخامت زون  
+✔ تنظیم رنگ زون‌ها  
+
+---
+
+# 🧰 پیش‌نیازها
+
+قبل از اجرای پروژه:
+
+✔ MetaTrader 5 نصب باشد  
+✔ Python 3.10+ نصب باشد  
+✔ حساب MT5 فعال باشد  
+
+---
+
+# 📥 نصب پروژه
+
+دانلود:
+
+```
+git clone https://github.com/jalilahmad/mt5_zone_monitor.git
+```
+
+یا Download ZIP.
+
+---
+
+# 📦 نصب کتابخانه‌ها
+
+```
 pip install -r requirements.txt
 ```
 
-## Running the App
+---
 
-### From the command line
+# ▶️ اجرای برنامه
 
-```bash
+```
 streamlit run app.py
 ```
 
-### From VS Code
+بعد:
 
-1. Open the workspace folder in VS Code.
-2. Open the Run and Debug panel.
-3. Select `Run Streamlit App`.
-4. Start the configuration.
+```
+http://localhost:8501
+```
 
-This launches the Streamlit app in the integrated terminal and opens the local
-app address in your browser.
+باز می‌شود.
 
-## Configuration
+---
 
-The app configuration is stored in `config.py`:
+# 🔔 سیستم هشدار
 
-- `TIMEZONE`: local timezone for MT5 chart data
-- `DAY_START_HOUR` / `DAY_START_MINUTE`: local trading day start
-- `ZONE_PERCENT`: percentage of the range used to build each alert zone
-- `ALERT_DISTANCE_PIPS`: pip distance threshold for alerts
-- `CHECK_INTERVAL_SECONDS`: refresh interval for the dashboard
-- `ALERT_SOUND_PATH`: path to the alert sound file
+هشدار زمانی فعال می‌شود که:
 
-## File Structure
+```
+Distance ≤ ALERT_DISTANCE_PIPS
+```
 
-- `app.py` - main Streamlit dashboard and alert loop
-- `config.py` - application settings and constants
-- `mt5_connector.py` - MetaTrader 5 connection helpers
-- `watchlist.py` - loads visible symbols from MT5
-- `zone_calculator.py` - calculates daily and weekly price zones
-- `price_monitor.py` - symbol price formatting and distance checks
-- `alert_manager.py` - desktop and sound notifications
-- `time_utils.py` - timezone-aware datetime helpers
-- `assets/` - media assets used by the application
+---
 
-## Notes
+# ⚙️ تنظیمات
 
-- Make sure MetaTrader 5 is running and the account is logged in before
-  launching the app.
-- The app uses the MT5 symbol decimal precision to format prices correctly.
-- If no visible symbols are found, the dashboard shows an error message.
+در فایل:
 
-## GitHub Ready
+```
+config.py
+```
 
-This project includes:
+---
 
-- `requirements.txt` for dependency management
-- `.vscode/launch.json` for running the Streamlit app from VS Code
-- `.gitignore` to exclude generated files and local environment folders
+# 📁 ساختار پروژه
 
-## Troubleshooting
+```
+mt5_zone_monitor/
 
-- `MT5 initialize failed`: verify MetaTrader 5 is installed and started.
-- `Not logged in to MT5`: confirm the account is logged in inside MetaTrader 5.
-- `No visible MT5 symbols were loaded`: ensure the symbol market watch list is visible.
+Indicator/
+assets/
+
+app.py
+config.py
+mt5_connector.py
+watchlist.py
+zone_calculator.py
+price_monitor.py
+alert_manager.py
+time_utils.py
+
+requirements.txt
+README.md
+```
+
+---
+
+# 🇺🇸 MT5 Zone Monitor
+## Real-Time Zone Monitoring Tool
+
+---
+
+# 🎥 Strategy Source Video
+
+This project is based on the trading strategy explained in:
+
+📺 Video Link:
+https://www.youtube.com/watch?v=yRaVX650-Zs
+
+This video explains:
+
+- Today High / Low  
+- Yesterday High / Low  
+- Last Week High / Low  
+- Current Week High / Low  
+- Higher Timeframe Levels  
+
+It is recommended to watch the video before using the tool.
+
+---
+
+# 🧠 Project Overview
+
+MT5 Zone Monitor:
+
+✔ Connects to MetaTrader 5  
+✔ Reads Market Watch symbols  
+✔ Calculates important price zones  
+✔ Monitors price in real-time  
+✔ Sends alerts when price approaches zones  
+
+---
+
+# 📊 Indicator Usage
+
+Indicator is located in:
+
+```
+Indicator/
+```
+
+---
+
+## How to Use Indicator
+
+1️⃣ Open TradingView  
+
+2️⃣ Create new Pine Script  
+
+3️⃣ Paste indicator code  
+
+4️⃣ Add to chart  
+
+---
+
+# 🧰 Requirements
+
+✔ MetaTrader 5  
+✔ Python 3.10+  
+✔ Active trading account  
+
+---
+
+# 📥 Installation
+
+```
+git clone https://github.com/jalilahmad/mt5_zone_monitor.git
+```
+
+---
+
+# 📦 Install Dependencies
+
+```
+pip install -r requirements.txt
+```
+
+---
+
+# ▶️ Run Application
+
+```
+streamlit run app.py
+```
+
+---
+
+# 🔔 Alert System
+
+Alert triggers when:
+
+```
+Distance ≤ ALERT_DISTANCE_PIPS
+```
+
+---
+
+# 👨‍💻 Author
+
+Developed by:
+
+Jalil Ahmad Fazeli
+
