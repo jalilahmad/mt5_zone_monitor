@@ -8,7 +8,7 @@
 
 # 🎥 منبع استراتژی (ویدیو آموزشی)
 
-این پروژه بر اساس استراتژی معرفی‌شده در ویدیوی زیر طراحی شده است:
+این پروژه بر اساس استراتژی معرفی‌شده در ویدیوی زیر مربوط به کانال یوتیوب آریا ترید طراحی شده است:
 
 📺 لینک ویدیو:
 https://www.youtube.com/watch?v=yRaVX650-Zs
@@ -202,7 +202,7 @@ README.md
 
 # 🎥 Strategy Source Video
 
-This project is based on the trading strategy explained in:
+This project is based on the trading strategy explained by Ariya Trade youtube chanel in:
 
 📺 Video Link:
 https://www.youtube.com/watch?v=yRaVX650-Zs
