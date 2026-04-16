@@ -1,4 +1,6 @@
-
+<p align="center">
+  <img src="assets/banner.png" alt="MT5 Zone Monitor Banner" width="100%">
+</p>
 #  MT5 Zone Monitor
 ## ابزار مانیتورینگ زون‌های مهم بازار بر اساس استراتژی سطوح روزانه و هفتگی
 
